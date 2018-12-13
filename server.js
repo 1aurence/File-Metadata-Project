@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/user', userRoutes)
 app.use('/exercise', exerciseRoutes)
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')));
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }, (err) => {
 if(err) console.log(err.message);

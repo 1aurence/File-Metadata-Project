@@ -1,20 +1,30 @@
 const express = require('express')
 const app = express()
-const fileUpload = require('express-fileupload')
+require('dotenv').config();
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
 const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`Listening on port ${port}`))
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(fileUpload());
+const userRoutes = require('./routes/user')
+const exerciseRoutes = require('./routes/exercise')
 
-app.post('/upload', function (req, res) {
-    const {
-        name,
-        mimetype,
-    } = req.files.userfile
-    const size = req.files.userfile.data.toString().length
-    res.json({
-        name,
-        mimetype,
-        size
-    })
+app.listen(port, () => console.log(`Listening on port ${port}`))
+app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use('/user', userRoutes)
+app.use('/exercise', exerciseRoutes)
+
+app.use(express.static('public'));
+
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }, (err) => {
+if(err) console.log(err.message);
+console.log('Connected to DB')
+})
+
+app.use(function(req, res, err, next) {
+    if(err) {
+        console.log('err',err.message)
+    }
+})
+app.get('*', function (req, res){
+    res.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
